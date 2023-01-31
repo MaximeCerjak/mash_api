@@ -4,6 +4,16 @@
 !app/cache/.gitkeep
 !app/logs/.gitkeep
 
+###> symfony/framework-bundle ###
+/.env.local
+/.env.local.php
+/.env.*.local
+/config/secrets/prod/prod.decrypt.private.php
+/public/bundles/
+/var/
+/vendor/
+###< symfony/framework-bundle ###
+
 # Email spool folder
 /app/spool/*
 
