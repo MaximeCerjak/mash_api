@@ -4,6 +4,8 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use App\Entity\Picture;
+use App\Entity\User;
 
 /**
  * Download
@@ -89,5 +91,4 @@ class Download
 
         return $this;
     }
-
 }

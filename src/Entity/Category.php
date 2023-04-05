@@ -32,7 +32,7 @@ class Category
     /**
      * @var string|null
      *
-     * @ORM\Column(name="cat_description", type="text", length=0, nullable=true, options={"default"="NULL"})
+     * @ORM\Column(name="cat_description", type="text", length=0, nullable=true)
      */
     private $catDescription = 'NULL';
 
@@ -65,5 +65,4 @@ class Category
 
         return $this;
     }
-
 }

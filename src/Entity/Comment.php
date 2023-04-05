@@ -4,6 +4,9 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use App\Entity\Picture;
+use App\Entity\Article;
+use App\Entity\User;
 
 /**
  * Comment
@@ -130,5 +133,4 @@ class Comment
 
         return $this;
     }
-
 }
