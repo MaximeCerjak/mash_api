@@ -11,10 +11,12 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use App\Entity\User;
-use Symfony\Component\Serializer\SerializerInterface;
 use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
-use Symfony\Component\Validator\Constraints as Assert;
+use Nelmio\ApiDocBundle\Annotation\Model;
+use OpenApi\Annotations as OA;
+use Nelmio\ApiDocBundle\Annotation\Security;
+
 
 class UserController extends AbstractController
 {
@@ -26,7 +28,25 @@ class UserController extends AbstractController
     ) {
     }
 
-    #[Route('/user', name: 'app_user')]
+    /**
+     * @Route("/user", name="app_user", methods={"GET"})
+     * @OA\Response(
+     *     response=200,
+     *     description="Returns a list of users",
+     *     @OA\JsonContent(
+     *         type="array",
+     *         @OA\Items(ref=@Model(type=User::class, groups={"full"}))
+     *     )
+     * )
+     * @OA\Parameter(
+     *     name="order",
+     *     in="query",
+     *     description="The field used to order users",
+     *     @OA\Schema(type="string")
+     * )
+     * @OA\Tag(name="users")
+     * @Security(name="Bearer")
+     */
     public function index(UserRepository $userRepository): JsonResponse
     {
         $users = $userRepository->findAll();
@@ -45,7 +65,46 @@ class UserController extends AbstractController
         return $this->json($data);
     }
 
-    #[Route('/user/create', name: 'app_user_create')]
+    /**
+     * @Route("/user/create", methods={"POST"})
+     * @OA\Response(
+     *     response=201,
+     *     description="Creates a new user",
+     *     @OA\JsonContent(ref=@Model(type=User::class, groups={"user:create"}))
+     * )
+     * @OA\RequestBody(
+     *     description="User data",
+     *     required=true,
+     *     @OA\JsonContent(
+     *         @OA\Property(
+     *             property="email",
+     *             type="string",
+     *             description="The user's email",
+     *             example="user@example.com"
+     *         ),
+     *         @OA\Property(
+     *             property="name",
+     *             type="string",
+     *             description="The user's name",
+     *              example="John Doe"
+     *         ),
+     *         @OA\Property(
+     *             property="pseudo",
+     *             type="string",
+     *             description="The user's pseudo",
+     *             example="John"
+     *         ),
+     *         @OA\Property(
+     *             property="password",
+     *             type="string",
+     *             description="The user's password",
+     *             example="secret"
+     *         )
+     *     )
+     * )
+     * @OA\Tag(name="users")
+     * @Security(name="Bearer")
+     */
     public function create(Request $request): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
@@ -62,7 +121,23 @@ class UserController extends AbstractController
         return new JsonResponse(['message' => 'User created', 'status' => Response::HTTP_CREATED, 'user' => $user], Response::HTTP_CREATED);
     }
 
-    #[Route('/user/{id}', name: 'app_user_id')]
+    /**
+     * @Route("/user/{id}", methods={"GET"})
+     * @OA\Response(
+     *     response=200,
+     *     description="Returns the details of a specific user",
+     *     @OA\JsonContent(ref=@Model(type=User::class, groups={"user:details"}))
+     * )
+     * @OA\Parameter(
+     *     name="id",
+     *     in="path",
+     *     description="The user ID",
+     *     required=true,
+     *     @OA\Schema(type="integer")
+     * )
+     * @OA\Tag(name="users")
+     * @Security(name="Bearer")
+     */
     public function show(UserRepository $userRepository, $id): JsonResponse
     {
         $user = $userRepository->find($id);
@@ -78,7 +153,26 @@ class UserController extends AbstractController
         return $this->json($data);
     }
 
-    #[Route('/user/{id}/delete', name: 'app_user_id_delete')]
+    /**
+     * @Route("/user/{id}/delete", methods={"DELETE"})
+     * @OA\Response(
+     *     response=200,
+     *     description="Deletes a user",
+     *     @OA\JsonContent(
+     *         type="object",
+     *         @OA\Property(property="message", type="string", example="User deleted")
+     *     )
+     * )
+     * @OA\Parameter(
+     *     name="id",
+     *     in="path",
+     *     description="The user ID",
+     *     required=true,
+     *     @OA\Schema(type="integer")
+     * )
+     * @OA\Tag(name="users")
+     * @Security(name="Bearer")
+     */
     public function delete(UserRepository $userRepository, $id): JsonResponse
     {
         $user = $userRepository->find($id);
@@ -88,7 +182,31 @@ class UserController extends AbstractController
         return $this->json('User deleted');
     }
 
-    #[Route('/user/{id}/update', name: 'app_user_id_update')]
+    /**
+     * @Route("/user/{id}/update", methods={"PUT"})
+     * @OA\Response(
+     *     response=200,
+     *     description="Updates a user",
+     *     @OA\JsonContent(ref=@Model(type=User::class, groups={"user:update"}))
+     * )
+     * 
+     * @OA\RequestBody(
+     *     description="User data",
+     *     required=true,
+     *     @OA\JsonContent(ref=@Model(type=User::class, groups={"user:update"}))
+     * )
+     * 
+     * @OA\Parameter(
+     *     name="id",
+     *     in="path",
+     *     description="The user ID",
+     *     required=true,
+     *     @OA\Schema(type="integer")
+     * )
+     * 
+     * @OA\Tag(name="users")
+     * @Security(name="Bearer")
+     */
     public function update(UserRepository $userRepository, $id): JsonResponse
     {
         $user = $userRepository->find($id);
