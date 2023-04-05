@@ -5,6 +5,11 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\Collection;
+use App\Entity\Picture;
+use App\Entity\CategoryArticle;
+use App\Entity\User;
+use Doctrine\Common\Collections\ArrayCollection;
+
 
 /**
  * Article
@@ -65,7 +70,7 @@ class Article
     private $user;
 
     /**
-     * @var \Doctrine\Common\Collections\Collection
+     * @var Collection
      *
      * @ORM\ManyToMany(targetEntity="Picture", inversedBy="article")
      * @ORM\JoinTable(name="article_picture",
@@ -84,7 +89,7 @@ class Article
      */
     public function __construct()
     {
-        $this->picture = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->picture = new ArrayCollection();
     }
 
     public function getId(): ?int

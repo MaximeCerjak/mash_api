@@ -6,16 +6,17 @@ use App\Repository\UserRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use App\Entity\Picture;
 
 /**
  * @ORM\Entity(repositoryClass=UserRepository::class)
  */
-class User implements UserInterface, PasswordAuthenticatedUserInterface
+class User implements PasswordAuthenticatedUserInterface, UserInterface
 {
     /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
+     * @ORM\Id
+     * @ORM\GeneratedValue(strategy="IDENTITY")
      */
     private $id;
 
@@ -39,7 +40,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private $pseudo;
 
     /**
-     * @ORM\Column(type="array")
+     * @ORM\Column(type="json")
      */
     private $roles = [];
 
@@ -54,7 +55,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * 
      * @ORM\ManyToOne(targetEntity="Picture")
      * @ORM\JoinColumns({
-     *  @ORM\JoinColumn(name="picture_id", referencedColumnName="id")
+     * @ORM\JoinColumn(name="picture_id", referencedColumnName="id")
      * })
      * 
      */
@@ -165,5 +166,24 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         // If you store any temporary, sensitive data on the user, clear it here
         // $this->plainPassword = null;
+    }
+    /**
+     * Returns the salt that was originally used to hash the password.
+     *
+     * This can return null if the password was not hashed using a salt.
+     *
+     * This method is deprecated since Symfony 5.3, implement it from {@link LegacyPasswordAuthenticatedUserInterface} instead.
+     * @return string|null
+     */
+    public function getSalt()
+    {
+    }
+
+    /**
+     * @return string
+     */
+    public function getUsername()
+    {
+        return $this->email;
     }
 }

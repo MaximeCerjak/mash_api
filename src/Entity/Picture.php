@@ -5,6 +5,8 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\Collection;
+use App\Entity\User;
+use App\Entity\Category;
 
 /**
  * Picture
@@ -83,7 +85,7 @@ class Picture
      *
      * @ORM\ManyToMany(targetEntity="Article", mappedBy="picture")
      */
-    private $article = array();
+    private $article = [];
 
     /**
      * Constructor
@@ -189,5 +191,4 @@ class Picture
     {
         return $this->article;
     }
-
 }

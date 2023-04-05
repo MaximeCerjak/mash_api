@@ -39,7 +39,7 @@ class CategoryArticle
     private $catDescription;
 
     /**
-     * @var \Doctrine\Common\Collections\Collection
+     * @var Collection
      *
      * @ORM\OneToMany(targetEntity="Article", mappedBy="categoryArticle")
      * @ORM\JoinColumns({
@@ -53,7 +53,7 @@ class CategoryArticle
      */
     public function __construct()
     {
-        $this->article = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->article = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -92,5 +92,4 @@ class CategoryArticle
     {
         return $this->article;
     }
-
 }

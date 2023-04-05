@@ -11,11 +11,19 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use App\Entity\User;
+use Symfony\Component\Serializer\SerializerInterface;
+use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Component\Validator\Constraints as Assert;
 
 class UserController extends AbstractController
 {
-    public function __construct(private ManagerRegistry $doctrine, private UserPasswordHasherInterface $passwordHasher)
-    {
+    public function __construct(
+        private ManagerRegistry $doctrine,
+        private UserPasswordHasherInterface $passwordHasher,
+        private JWTTokenManagerInterface $JWTManager,
+        private ValidatorInterface $validator
+    ) {
     }
 
     #[Route('/user', name: 'app_user')]
