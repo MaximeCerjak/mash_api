@@ -17,7 +17,6 @@ use Nelmio\ApiDocBundle\Annotation\Model;
 use OpenApi\Annotations as OA;
 use Nelmio\ApiDocBundle\Annotation\Security;
 
-
 class UserController extends AbstractController
 {
     public function __construct(
@@ -105,7 +104,7 @@ class UserController extends AbstractController
      * @OA\Tag(name="users")
      * @Security(name="Bearer")
      */
-    public function create(Request $request): JsonResponse
+    public function create(Request $request, JWTTokenManagerInterface $jwtManager): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
         $user = new User();
@@ -117,8 +116,10 @@ class UserController extends AbstractController
         $entityManager = $this->doctrine->getManager();
         $entityManager->persist($user);
         $entityManager->flush();
+
+        $token = $jwtManager->create($user);
         //New JsonResponse return message, status code and user 
-        return new JsonResponse(['message' => 'User created', 'status' => Response::HTTP_CREATED, 'user' => $user], Response::HTTP_CREATED);
+        return new JsonResponse(['message' => 'User created', 'status' => Response::HTTP_CREATED, 'user' => $user, 'token' => $token], Response::HTTP_CREATED);
     }
 
     /**
