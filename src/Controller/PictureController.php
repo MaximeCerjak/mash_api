@@ -11,9 +11,7 @@ class PictureController extends AbstractController
     #[Route('/picture', name: 'app_picture')]
     public function index(): JsonResponse
     {
-        return $this->json([
-            'message' => 'Welcome to your new controller!',
-            'path' => 'src/Controller/PictureController.php',
-        ]);
+        //getPictures from bdd and return them
+        return new JsonResponse(['message' => 'Welcome to your new controller!']);
     }
 }

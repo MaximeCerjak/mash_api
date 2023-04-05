@@ -17,7 +17,7 @@ class UserController extends AbstractController
     public function __construct(private ManagerRegistry $doctrine, private UserPasswordHasherInterface $passwordHasher)
     {
     }
-    
+
     #[Route('/user', name: 'app_user')]
     public function index(UserRepository $userRepository): JsonResponse
     {
@@ -35,6 +35,23 @@ class UserController extends AbstractController
             ];
         }
         return $this->json($data);
+    }
+
+    #[Route('/user/create', name: 'app_user_create')]
+    public function create(Request $request): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+        $user = new User();
+        $user->setEmail($data['email']);
+        $user->setName($data['name']);
+        $user->setPseudo($data['pseudo']);
+        $user->setRoles(['ROLE_USER']);
+        $user->setPassword($this->passwordHasher->hashPassword($user, $data['password']));
+        $entityManager = $this->doctrine->getManager();
+        $entityManager->persist($user);
+        $entityManager->flush();
+        //New JsonResponse return message, status code and user 
+        return new JsonResponse(['message' => 'User created', 'status' => Response::HTTP_CREATED, 'user' => $user], Response::HTTP_CREATED);
     }
 
     #[Route('/user/{id}', name: 'app_user_id')]
@@ -71,22 +88,5 @@ class UserController extends AbstractController
         $entityManager->persist($user);
         $entityManager->flush();
         return $this->json('User updated');
-    }
-
-    #[Route('/user/create', name: 'app_user_create')]
-    public function create(Request $request): JsonResponse
-    {
-        $data = json_decode($request->getContent(), true);
-        $user = new User();
-        $user->setEmail($data['email']);
-        $user->setName($data['name']);
-        $user->setPseudo($data['pseudo']);
-        $user->setRoles(['ROLE_USER']);
-        $user->setPassword($this->passwordHasher->hashPassword($user, $data['password']));
-        $user->setPicture($data['picture']);
-        $entityManager = $this->doctrine->getManager();
-        $entityManager->persist($user);
-        $entityManager->flush();
-        return new Response('User created', Response::HTTP_CREATED);
     }
 }
