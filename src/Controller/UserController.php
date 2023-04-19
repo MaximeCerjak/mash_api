@@ -16,6 +16,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use OpenApi\Annotations as OA;
 use Nelmio\ApiDocBundle\Annotation\Security;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 class UserController extends AbstractController
 {
@@ -111,7 +112,13 @@ class UserController extends AbstractController
         $user->setEmail($data['email']);
         $user->setName($data['name']);
         $user->setPseudo($data['pseudo']);
-        $user->setRoles(['ROLE_USER']);
+
+        if ($data['typeUser'] === 'creator') {
+            $user->setRoles(['ROLE_CREATOR']);
+        } else {
+            $user->setRoles(['ROLE_USER']);
+        }
+
         $user->setPassword($this->passwordHasher->hashPassword($user, $data['password']));
         $entityManager = $this->doctrine->getManager();
         $entityManager->persist($user);
@@ -120,6 +127,26 @@ class UserController extends AbstractController
         $token = $jwtManager->create($user);
         //New JsonResponse return message, status code and user 
         return new JsonResponse(['message' => 'User created', 'status' => Response::HTTP_CREATED, 'user' => $user, 'token' => $token], Response::HTTP_CREATED);
+    }
+
+    /**
+     * @Route("/user/role", methods={"GET"})
+     * @OA\Response(
+     *     response=200,
+     *     description="Returns the details of the authenticated user",
+     *     @OA\JsonContent(ref=@Model(type=User::class, groups={"user:details"}))
+     * )
+     * @OA\Tag(name="users")
+     * @Security(name="Bearer")
+     */
+    public function userRole(UserInterface $user): JsonResponse
+    {
+        $data = [
+            'roles' => $user->getRoles(),
+            'id' => $user->getUserIdentifier(),
+        ];
+
+        return $this->json($data);
     }
 
     /**
