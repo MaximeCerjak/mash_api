@@ -17,6 +17,8 @@ use Nelmio\ApiDocBundle\Annotation\Model;
 use OpenApi\Annotations as OA;
 use Nelmio\ApiDocBundle\Annotation\Security;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+
 
 class UserController extends AbstractController
 {
@@ -59,7 +61,7 @@ class UserController extends AbstractController
                 'pseudo' => $user->getPseudo(),
                 'roles' => $user->getRoles(),
                 'password' => $user->getPassword(),
-                'picture' => $user->getPicture(),
+                'picture' => $user->getPictures(),
             ];
         }
         return $this->json($data);
@@ -148,6 +150,30 @@ class UserController extends AbstractController
     }
 
     /**
+     * @Route("/user/me", methods={"GET"})
+     * @OA\Response(
+     *     response=200,
+     *     description="Returns the details of the authenticated user",
+     *     @OA\JsonContent(ref=@Model(type=User::class, groups={"user:details"}))
+     * )
+     * @OA\Tag(name="users")
+     * @Security(name="Bearer")
+     */
+    public function getAuthenticatedUser(TokenStorageInterface $TSI, UserRepository $userRepository): JsonResponse
+    {
+        $authenticatedUser = $TSI->getToken()->getUser();
+
+        if (!($authenticatedUser instanceof User)) {
+            return $this->json(['error' => 'Invalid user'], JsonResponse::HTTP_UNAUTHORIZED);
+        }
+
+        $user = $userRepository->findOneById($authenticatedUser->getId());
+
+        return $this->json($user, JsonResponse::HTTP_OK, [], ['groups' => ['user:details', 'user:pictures']]);
+    }
+
+
+    /**
      * @Route("/user/{id}", methods={"GET"})
      * @OA\Response(
      *     response=200,
@@ -174,7 +200,7 @@ class UserController extends AbstractController
             'pseudo' => $user->getPseudo(),
             'roles' => $user->getRoles(),
             'password' => $user->getPassword(),
-            'picture' => $user->getPicture(),
+            'picture' => $user->getPictures(),
         ];
         return $this->json($data);
     }

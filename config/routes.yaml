@@ -20,3 +20,12 @@ app.swagger:
 api_login_check:
     path: /api/login_check
 
+uploads:
+    path: /uploads/{filename}
+    controller: Symfony\Bundle\FrameworkBundle\Controller\RedirectController::urlRedirectAction
+    defaults:
+        path: '%kernel.project_dir%/public/uploads/'
+        keepQueryParams: true
+    requirements:
+        filename: .+
+

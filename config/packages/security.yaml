@@ -37,7 +37,8 @@ security:
             switch_user: true
             
     role_hierarchy:
-        ROLE_USER:              
+        ROLE_USER: 
+        ROLE_CREATOR:           [ ROLE_USER ]             
         ROLE_ADMIN:             [ ROLE_USER ]
         ROLE_SUPER_ADMIN:       [ ROLE_ADMIN, ROLE_ALLOWED_TO_SWITCH ]
     
@@ -49,6 +50,7 @@ security:
         - { path: ^/api/user/profile, roles: ROLE_USER }
         - { path: ^/api/login, roles: PUBLIC_ACCESS }
         - { path: ^/api/user/create, roles: PUBLIC_ACCESS }
+        - { path: ^/api/category/article, roles: PUBLIC_ACCESS }
         - { path: ^/api,       roles: IS_AUTHENTICATED_FULLY }
 
 when@test:

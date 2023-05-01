@@ -5,8 +5,10 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
 use App\Entity\User;
 use App\Entity\Category;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * Picture
@@ -22,6 +24,7 @@ class Picture
      * @ORM\Column(name="id", type="integer", nullable=false)
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="IDENTITY")
+     * @Groups({"user:pictures", "picture:details"})
      */
     private $id;
 
@@ -29,6 +32,7 @@ class Picture
      * @var string
      *
      * @ORM\Column(name="pic_url", type="string", length=255, nullable=false)
+     * @Groups({"user:pictures", "picture:details"})
      */
     private $picUrl;
 
@@ -36,6 +40,7 @@ class Picture
      * @var string
      *
      * @ORM\Column(name="pic_legend", type="text", length=0, nullable=false)
+     * @Groups({"user:pictures", "picture:details"})
      */
     private $picLegend;
 
@@ -43,6 +48,7 @@ class Picture
      * @var string
      *
      * @ORM\Column(name="pic_title", type="string", length=255, nullable=false)
+     * @Groups({"user:pictures", "picture:details"})
      */
     private $picTitle;
 
@@ -50,6 +56,7 @@ class Picture
      * @var string
      *
      * @ORM\Column(name="pic_format", type="string", length=25, nullable=false)
+     * @Groups({"user:pictures", "picture:details"})
      */
     private $picFormat;
 
@@ -57,6 +64,7 @@ class Picture
      * @var string
      *
      * @ORM\Column(name="crea_description", type="text", length=0, nullable=true)
+     * @Groups({"user:pictures", "picture:details"})
      */
     private $creaDescription;
 
@@ -87,12 +95,20 @@ class Picture
      */
     private $article = [];
 
+
+    /**
+     * @var Download[]|ArrayCollection
+     * @ORM\OneToMany(targetEntity="Download", mappedBy="picture")
+     */
+    private $downloads;
+
     /**
      * Constructor
      */
     public function __construct()
     {
-        $this->article = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->article = new ArrayCollection();
+        $this->downloads = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -190,5 +206,20 @@ class Picture
     public function getArticle(): Collection
     {
         return $this->article;
+    }
+
+    public function getDownloads(): Collection
+    {
+        return $this->downloads;
+    }
+
+    public function addDownload(Download $download): self
+    {
+        if (!$this->downloads->contains($download)) {
+            $this->downloads[] = $download;
+            $download->setPicture($this);
+        }
+
+        return $this;
     }
 }
